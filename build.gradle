@@ -1,0 +1,64 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.3.RELEASE'
+        versions = [
+                jackson: '2.7.1',
+                vaadin: '8.0.6'
+        ]
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "http://maven.vaadin.com/vaadin-addons" }
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
+
+compileJava {
+    options.incremental = true
+    options.compilerArgs << '-parameters'
+    options.compilerArgs << '-Xlint:unchecked'
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    compile "com.fasterxml.jackson.core:jackson-annotations:$versions.jackson"
+    compile "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+    compile "com.fasterxml.jackson.core:jackson-databind:$versions.jackson-1"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$versions.jackson"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$versions.jackson"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$versions.jackson"
+    
+    compile("org.springframework.boot:spring-boot-starter-data-rest") {
+        exclude module: 'spring-boot-starter-tomcat'
+    }
+    compile "org.springframework.boot:spring-boot-starter-undertow:$springBootVersion"
+    compile "org.projectlombok:lombok:1.16.10"
+
+    compile "com.vaadin:vaadin-server:$versions.vaadin"
+    compile "com.vaadin:vaadin-push:$versions.vaadin"
+    compile "com.vaadin:vaadin-themes:$versions.vaadin"
+    compile "com.vaadin:vaadin-client-compiled:$versions.vaadin"
+    compile "com.vaadin:vaadin-spring-boot:2.0.1"
+    compile "com.sebworks:vaadstrap:0.2.1"
+    compile "org.vaadin.spring.addons:vaadin-spring-addon-eventbus:2.0.0.RELEASE"
+    testCompile "org.springframework.boot:spring-boot-starter-test"
+}
