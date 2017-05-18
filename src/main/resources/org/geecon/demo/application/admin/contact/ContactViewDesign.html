@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;../../src/main/java&quot;,&quot;THEME&quot;:&quot;rockstar&quot;}">
+  <meta name="vaadin-version" content="8.0.5">
+  <meta name="package-mapping" content="org_geecon_demo_application_admin_components:org.geecon.demo.application.admin.components">
+ </head>
+ <body>
+  <vaadin-horizontal-split-panel>
+   <vaadin-vertical-layout size-full>
+    <vaadin-horizontal-layout width-full>
+     <vaadin-text-field placeholder="" width-full _id="filterField" :expand></vaadin-text-field>
+     <vaadin-button icon="fonticon://Vaadin-Icons/e801" plain-text _id="addButton" :right>
+       Add 
+     </vaadin-button>
+    </vaadin-horizontal-layout>
+    <vaadin-grid size-full data-item-type="org.geecon.demo.domain.contact.dto.ContactQueryDto" _id="grid" :expand>
+     <table>
+      <colgroup>
+       <col column-id="name" sortable>
+       <col column-id="company" sortable>
+       <col column-id="phone" sortable>
+       <col column-id="email" sortable>
+       <col column-id="creationDate" sortable>
+       <col column-id="modificationDate" sortable>
+      </colgroup>
+      <thead>
+       <tr default>
+        <th plain-text column-ids="name">Name</th>
+        <th plain-text column-ids="company">Company</th>
+        <th plain-text column-ids="phone">Phone</th>
+        <th plain-text column-ids="email">Email</th>
+        <th plain-text column-ids="creationDate">CreationDate</th>
+        <th plain-text column-ids="modificationDate">ModificationDate</th>
+       </tr>
+      </thead>
+      <tbody></tbody>
+     </table>
+    </vaadin-grid>
+   </vaadin-vertical-layout>
+   <vaadin-form-layout size-full margin>
+    <vaadin-label style-name="h2" plain-text>
+      Contact Editor 
+    </vaadin-label>
+    <vaadin-text-field caption="Name" width-full _id="nameField"></vaadin-text-field>
+    <vaadin-text-field caption="Company" width-full _id="companyField"></vaadin-text-field>
+    <vaadin-text-area caption="Description" width-full _id="descriptionField"></vaadin-text-area>
+    <vaadin-text-field caption="Address" width-full _id="addressField"></vaadin-text-field>
+    <vaadin-text-field caption="City" width-full _id="cityField"></vaadin-text-field>
+    <vaadin-text-field caption="Zip Code" width-full _id="zipCodeField"></vaadin-text-field>
+    <vaadin-text-field caption="Phone
+" width-full _id="phoneField"></vaadin-text-field>
+    <vaadin-text-field caption="Email" width-full _id="emailField"></vaadin-text-field>
+    <vaadin-horizontal-layout width-full>
+     <vaadin-button style-name="primary" width="6em" plain-text _id="editButton" :right :expand>
+       Edit 
+     </vaadin-button>
+     <vaadin-button style-name="friendly" width="6em" plain-text _id="saveButton" :right :expand>
+       Save 
+     </vaadin-button>
+     <vaadin-button style-name="danger" width="6em" plain-text _id="discardButton" :right>
+       Discard 
+     </vaadin-button>
+    </vaadin-horizontal-layout>
+   </vaadin-form-layout>
+  </vaadin-horizontal-split-panel>
+ </body>
+</html>

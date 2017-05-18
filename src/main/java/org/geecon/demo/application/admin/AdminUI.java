@@ -4,6 +4,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
+import org.geecon.demo.application.admin.contact.ContactView;
 
 @Theme("rockstar")
 @SpringUI(path = "/admin")
@@ -18,6 +19,6 @@ public class AdminUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
         setContent(dashboardComponent);
-//        getNavigator().navigateTo(RoomView.PATH);
+        getNavigator().navigateTo(ContactView.PATH);
     }
 }
