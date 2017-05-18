@@ -18,7 +18,10 @@ public class EditorLockedDialog extends EditorLockedDialogDesign {
         window.setContent(this);
         window.setModal(true);
 
-        discardButton.addClickListener(c -> discardListener.apply());
+        discardButton.addClickListener(c -> {
+            discardListener.apply();
+            hide();
+        });
     }
 
     public void show() {

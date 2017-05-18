@@ -5,25 +5,47 @@ import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.UI;
 import org.geecon.demo.domain.contact.ContactFacade;
 import org.geecon.demo.domain.contact.dto.ContactQueryDto;
 import org.geecon.demo.domain.contact.dto.NewContactDto;
 import org.geecon.demo.domain.contact.dto.UpdateContactDto;
+import org.geecon.demo.infrastructure.vaadin.ActionType;
+import org.geecon.demo.infrastructure.vaadin.EditorAction;
+import org.geecon.demo.infrastructure.vaadin.EditorLockedDialog;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import javax.annotation.PreDestroy;
+
+@UIScope
 @SpringView(name = ContactView.PATH)
 public class ContactView extends ContactViewDesign implements View {
 
     public final static String PATH = "contacts";
     private final ContactFacade contactFacade;
     private final Binder<ContactPojo> binder = new Binder<>();
+    private final EventBus.ApplicationEventBus applicationEventBus;
 
-    public ContactView(ContactFacade contactFacade) {
+    private EditorLockedDialog editorLockedDialog = new EditorLockedDialog(this::discardChanges);
+    private UI ui = UI.getCurrent();
+
+    public ContactView(ContactFacade contactFacade, EventBus.ApplicationEventBus applicationEventBus) {
         this.contactFacade = contactFacade;
+        this.applicationEventBus = applicationEventBus;
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        applicationEventBus.unsubscribe(this);
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
+        applicationEventBus.subscribe(this);
+
         setupBinder();
 
         grid.setDataProvider(
@@ -34,7 +56,16 @@ public class ContactView extends ContactViewDesign implements View {
 
         filterField.addValueChangeListener(l -> grid.getDataProvider().refreshAll());
 
-        editButton.addClickListener(c -> updateUIButtons(true));
+        editButton.addClickListener(c -> {
+            updateUIButtons(true);
+            applicationEventBus.publish(
+                this,
+                EditorAction.builder()
+                    .actionType(ActionType.EDIT)
+                    .id(binder.getBean().getId())
+                    .build()
+            );
+        });
 
         discardButton.addClickListener(this::onDiscardClick);
 
@@ -92,15 +123,67 @@ public class ContactView extends ContactViewDesign implements View {
             }
             updateUIButtons(false);
         }
+
+        applicationEventBus.publish(
+            this,
+            EditorAction.builder()
+                .actionType(ActionType.SAVE)
+                .id(binder.getBean().getId())
+                .build()
+        );
+
     }
 
     private void onDiscardClick(Button.ClickEvent e) {
+        discardChanges();
+    }
+
+    private void discardChanges() {
         ContactPojo item = binder.getBean();
         binder.removeBean();
         updateUIButtons(false);
 
         if (item.getId() != null)
             contactFacade.findOne(item.getId()).ifPresent(this::bindItemToEditor);
+
+        applicationEventBus.publish(
+            this,
+            EditorAction.builder()
+                .actionType(ActionType.DISCARD)
+                .id(binder.getBean().getId())
+                .build()
+        );
+    }
+
+    @EventBusListenerMethod
+    private void onEditorActionEvent(org.vaadin.spring.events.Event<EditorAction> event) {
+        if (ui.isAttached()) {
+            ui.access(() -> {
+                if (!event.getSource().equals(ContactView.this)
+                    && binder.getBean() != null
+                    && binder.getBean().getId().equals(event.getPayload().getId())
+                    && saveButton.isVisible()
+                    ) {
+
+                    switch (event.getPayload().getActionType()) {
+                        case EDIT:
+                            if (!editorLockedDialog.isShown())
+                                editorLockedDialog.show();
+                            break;
+
+                        case DISCARD:
+                            if (editorLockedDialog.isShown())
+                                editorLockedDialog.hide();
+                            break;
+
+                        case SAVE:
+                            editorLockedDialog.hide();
+                            discardChanges();
+                            break;
+                    }
+                }
+            });
+        }
     }
 
     private void setupBinder() {
